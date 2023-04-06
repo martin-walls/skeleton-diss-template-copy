@@ -1,0 +1,193 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{mrw}[2022/10/11 Martin Walls]
+
+\RequirePackage{enumitem}
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{fancyhdr}
+\RequirePackage{lastpage}
+\RequirePackage{fontspec}
+\RequirePackage{listings}
+\RequirePackage{amsmath}
+\RequirePackage{float}
+\RequirePackage[binary-units]{siunitx}
+\RequirePackage{multirow}
+\RequirePackage{booktabs}
+\RequirePackage{array}
+\RequirePackage{tabularx}
+\RequirePackage{xltabular}
+% Make footnote numbering restart from 1 at start of each page
+% And don't indent them
+\RequirePackage[perpage, hang, flushmargin]{footmisc}
+\RequirePackage[hidelinks]{hyperref}
+\RequirePackage{tikzit}
+% make _ work in normal text without needing escaping
+\RequirePackage{underscore}
+% load after any other math/font packages
+\RequirePackage{unicode-math}
+
+% Date formatting
+\RequirePackage[UKenglish]{datetime2}
+% x^th Month, Year
+\DTMlangsetup{ord=raise, monthyearsep={,\space}}
+
+% Allow disabling of setting geometry options
+\newif\if@setgeometry       % declare new boolean
+\@setgeometrytrue           % set boolean to true
+\DeclareOption{nogeometry}{ % if nogeometry option supplied, set boolean to false
+  \@setgeometryfalse
+}
+
+\newif\if@bigmarginright
+\@bigmarginrightfalse
+\DeclareOption{bigmarginright}{
+  \@bigmarginrighttrue
+}
+
+% Option for supo-specific commands
+\newif\if@supowork
+\@supoworkfalse
+\DeclareOption{supo}{
+  \@supoworktrue
+  \@setgeometryfalse
+}
+
+% option for minted numbering
+\newif\if@MintedNumberingByChapter
+\@MintedNumberingByChapterfalse
+\DeclareOption{MintedNumberingByChapter}{
+  \@MintedNumberingByChaptertrue
+}
+
+\newif\if@NoSpaceAroundMinted
+\@NoSpaceAroundMintedfalse
+\DeclareOption{NoSpaceAroundMinted}{
+  \@NoSpaceAroundMintedtrue
+}
+
+\ProcessOptions\relax
+
+% Syntax-highlighted code
+% We need this if stmt because [chapter] numbering will error when the document class
+% doesn't have chapters
+\if@MintedNumberingByChapter
+  \RequirePackage[chapter]{minted}
+\else
+  \RequirePackage{minted}
+\fi
+
+
+\if@setgeometry
+  \newlength{\@marginright}
+  \setlength{\@marginright}{2cm}
+  \if@bigmarginright
+    \setlength{\@marginright}{5cm}
+    \setlength{\marginparwidth}{4cm}
+  \fi
+  \RequirePackage[top=3cm,
+                  bottom=3cm,
+                  left=2cm,
+                  right=\@marginright]{geometry}
+
+  \setlength{\parindent}{0em}
+  \addtolength{\parskip}{1ex}
+\fi
+
+\defaultfontfeatures{Scale=MatchLowercase}
+\setmainfont[Numbers=Lining, Mapping=tex-text]{Libertinus Serif}
+\setsansfont[Mapping=tex-text]{Source Sans 3}
+% \setmonofont{Inconsolata LGC Markup}
+\setmonofont{Luxi Mono}
+
+% \setmathfont{Libertinus Math}
+
+% Basic code style
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily,
+  breaklines,
+  tabsize=2,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  commentstyle=\itshape\rmfamily,
+  frame=shadowbox,
+}
+% extend the style to add line numbers
+\definecolor{mrw_codenumbersgray}{rgb}{0.5,0.5,0.5} % I think this requires xparse package?
+\lstdefinestyle{codenumbered}{
+  style=code,
+  numbers=left,
+  numberstyle=\color{mrw_codenumbersgray},
+}
+
+\usemintedstyle{colorful}
+\setminted{numbersep=10pt,
+           breaklines}
+% reduce the vertical space around minted blocks
+\if@NoSpaceAroundMinted
+  \setlength{\partopsep}{-\topsep}
+\fi
+% Line numbers style
+\renewcommand{\theFancyVerbLine}{\rmfamily\small\textcolor{mrw_codenumbersgray}{\arabic{FancyVerbLine}}}
+
+\newcommand{\p}[1]{\ensuremath{\mathbb{P}\left (#1 \right )}}
+\newcommand{\gvn}{\,|\,}
+\newcommand{\bld}{\boldsymbol}
+\newcommand{\bigo}[1]{\ensuremath{\mathcal O\!\left({#1}\right)}}
+% Differential
+\NewDocumentCommand{\diff}{}{\ensuremath{\operatorname{d}\!}}
+
+% bigger diamond symbol, cos the default one is really small
+\DeclareRobustCommand{\bdiamond}{%
+  \text{\raisebox{0.7\depth}{\scalebox{.75}{\rotatebox[origin=c]{45}{$\Box$}}}}%
+}
+
+% double \langle and \rangle
+% using renewcommand because unicode-math package defines cmds with same name
+\newsavebox{\@brx}
+\newcommand{\llangle}[1][]{\savebox{\@brx}{\(\m@th{#1\langle}\)}
+  \mathopen{\copy\@brx\kern-0.5\wd\@brx\usebox{\@brx}}}
+\newcommand{\rrangle}[1][]{\savebox{\@brx}{\(\m@th{#1\rangle}\)}
+  \mathclose{\copy\@brx\kern-0.5\wd\@brx\usebox{\@brx}}}
+
+% Supo-specific commands
+\if@supowork
+  \newfontfamily\@MarkerCommentFont[Numbers=Lining, Mapping=tex-text]{Libertinus Sans}
+  \definecolor{mrw_questionrulecolor}{rgb}{0.5,0.5,0.5}
+  \NewDocumentEnvironment{question}{O{}}
+    {
+      \begin{minipage}[t]{\linewidth}%
+      \hfuzz=4pt%
+      \textcolor{mrw_questionrulecolor}{%
+      \rule[\baselineskip]{\linewidth}{0.5pt}}%
+      \vspace{-\baselineskip}%
+      \begin{itshape}
+    }
+    {
+      \end{itshape}\\
+      \textcolor{mrw_questionrulecolor}
+      {\def\@tempa{#1}\ifx\@tempa\@empty%
+        \rule[1.2ex]{\linewidth}{0.5pt}%
+        \vspace{0.6ex}%
+        \else%
+        \makebox[\linewidth - \widthof{\colorbox{white}{[#1]}} + 4pt][l]
+          {\rule[0.6ex]{\linewidth}{0.5pt}}%
+        \colorbox{white}{[#1]}%
+        \fi%
+      }%
+      \end{minipage}\nopagebreak%
+    }
+  \newcommand{\PhantomNegSpace}[1][]{\phantom{.}\vspace{-#1\baselineskip}}
+
+  \definecolor{mrw_marker_comment_text_color}{HTML}{C678DD}
+  \NewDocumentCommand{\MarkerComment}{m}{\marginpar{\textcolor{mrw_marker_comment_text_color}{\@MarkerCommentFont{\small #1}}}}
+\fi
+
+% table row style
+\newcolumntype{$}{>{\global\let\currentrowstyle\relax}}
+\newcolumntype{^}{>{\currentrowstyle}}
+\newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
+  #1\ignorespaces
+}
+
+\endinput

@@ -1,0 +1,109 @@
+\documentclass[12pt, a4paper, oneside, openany]{book}
+
+\usepackage[nogeometry, MintedNumberingByChapter, NoSpaceAroundMinted]{mrw}
+\usepackage{mrwchapters}
+
+\setmathfont{Libertinus Math}
+% Use default Latin Modern math font for symbols.
+% See https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode for symbol ranges.
+\setmathfont{latinmodern-math.otf}[range={"2200-"22FF,"2A00-"2AFF}] % chktex 18
+
+\input{03-metadata.tex}
+\input{02-preamble/01-colours.tex}
+\input{02-preamble/02-minted.tex}
+\input{02-preamble/03-math-cmds.tex}
+
+% Number subsubsections
+\setcounter{secnumdepth}{4}
+
+\usepackage[margin=2cm]{geometry}
+
+% Provides adjustwidth environment, used for pseudocode listings
+\usepackage{changepage}
+
+% For the bibliography
+\usepackage[sorting=none]{biblatex}
+\addbibresource{90-references.bib}
+
+% For including the original project proposal
+\usepackage{pdfpages}
+
+\pagestyle{fancy}
+\fancyhead[L]{\nouppercase\leftmark}
+\fancyhead[R]{\nouppercase\rightmark}
+\setlength{\headheight}{14.49998pt}
+\addtolength{\topmargin}{-2.49998pt}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\setlength{\parindent}{0pt}
+\addtolength{\parskip}{1ex}
+% slightly increase line spacing to be more readable
+\renewcommand{\baselinestretch}{1.1}
+
+\usepackage{pbox}
+
+% Caption style
+\usepackage[font=small,
+            labelfont=bf,
+            format=hang]{caption}
+\usepackage{subcaption}
+% Allow listings in subfigure
+\DeclareCaptionSubType{listing}
+
+% try to avoid widows and orphans
+\clubpenalty=1000
+\widowpenalty=1000
+\displaywidowpenalty=1000
+
+% Cross-referencing
+% cleveref should be loaded basically last in the preamble (according to the docs)
+\usepackage[capitalise, noabbrev, nameinlink]{cleveref}
+
+% best loaded last in the preamble (according to https://www.overleaf.com/learn/latex/Multi-file_LaTeX_projects)
+\usepackage{subfiles}
+
+\begin{document}
+
+\frontmatter
+
+\subfile{00-titlepage.tex}
+
+\pagestyle{plain}
+
+\subfile{01-frontmatter/10-declaration-of-originality.tex}
+
+\subfile{01-frontmatter/20-proforma.tex}
+
+\pagestyle{fancy}
+
+\tableofcontents
+
+\mainmatter
+
+\subfile{10-introduction}
+
+\subfile{20-preparation}
+
+\subfile{30-implementation}
+
+\subfile{40-evaluation}
+
+\subfile{50-conclusions}
+
+\printbibliography[heading=bibintoc]
+
+% Start appendices
+\appendix
+% Show "Appendix X" instead of just "X"
+\renewcommand{\ChapterNumber}{\colorbox{white}{\hspace{\ChapterNumberPadding}Appendix \thechapter\hspace{\ChapterNumberPadding}}}
+
+\subfile{60-appendices/10-lexer-fsm.tex}
+
+\subfile{60-appendices/20-parser-grammar.tex}
+
+\subfile{60-appendices/30-intermediate-code.tex}
+
+\subfile{60-appendices/00-original-proposal.tex}
+
+\end{document}
+

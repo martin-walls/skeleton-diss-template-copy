@@ -1,0 +1,18 @@
+% Needed for vertical alignment of signature
+\usepackage[export]{adjustbox}
+
+\newcommand{\FullName}{}
+\newcommand{\College}{}
+\newcommand{\ProjectTitle}{}
+\newcommand{\Examination}{}
+\newcommand{\CandidateNumber}{}
+\newcommand{\Date}{}
+\newcommand{\Year}{}
+\newcommand{\DissertationWordCount}{}
+\newcommand{\CodeLineCount}{}
+\newcommand{\ProjectOriginator}{}
+\newcommand{\ProjectSupervisor}{}
+
+\NewDocumentCommand{\Signature}{}{
+  \includegraphics[width=2cm, valign=m]{00-signature.jpg}
+}
